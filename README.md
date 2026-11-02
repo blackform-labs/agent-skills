@@ -28,11 +28,13 @@ The CLI requires Node.js 22.20 or later. To list available skills without instal
 
 ## Use manual-orchestrator
 
-In a Codex chat, ask:
+In a Codex chat, start the workflow with:
 
 ```text
-Use $manual-orchestrator to coordinate [objective].
+$manual-orchestrator init
 ```
+
+You can include your objective in the same message, or provide it when asked. You can also ask in natural language: `init manual-orchestrator`. These are chat instructions, not terminal commands. The skill follows your language for its responses and prompts unless you request another language.
 
 The orchestrator writes a project-local record and prepares one stage prompt at a time. The user opens each new worker chat, runs its `/goal` prompt, and returns the result to the orchestrator. Corrections stay in the same worker chat. Validation distinguishes reported work, verified evidence, and human acceptance. This workflow is designed for Codex: `/goal` and chat renaming may not be available in other agents, even if the CLI installs the skill for them.
 

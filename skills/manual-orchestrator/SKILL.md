@@ -1,11 +1,15 @@
 ---
 name: manual-orchestrator
-description: Coordinate staged work through fresh chats using user-carried prompts, validated handoffs, and a project-local record. Use when the user requests manual orchestration or invokes $manual-orchestrator.
+description: Coordinate staged work through fresh chats with user-carried prompts and validated handoffs. Use for manual orchestration or “init manual-orchestrator”.
 ---
 
 # Manual Orchestrator
 
 Coordinate the user's objective across stages. The user opens each fresh chat, pastes its prompt, and brings its result back. Keep this chat as the orchestrator; do not create chats, delegate to subagents, or execute stage work unless the user explicitly requests it. Writing the orchestration record and checking evidence are part of orchestration, not authorization to change the product.
+
+## Init
+
+Treat `init manual-orchestrator` and `$manual-orchestrator init` as requests to start this workflow, not as a shell or native slash command. If an objective is supplied, proceed to Start or resume. Otherwise, ask what the user wants to accomplish; do not invent an objective or create a record until it is known. Resume an existing effort if the request identifies it.
 
 ## Start or resume
 
@@ -35,4 +39,4 @@ Maintain one concise Markdown record per objective, updated at stage creation, v
 
 Do not fabricate checks, acceptance, chat identifiers, or approvals. Reference relevant artifacts rather than copying entire transcripts; avoid recording secrets. Keep prior material decisions and revision outcomes traceable. If the project location cannot be written, report the limitation and offer an appropriate existing writable location rather than silently claiming a record exists.
 
-Use the user's language for interaction unless requested otherwise. Keep generated stage prompts in the language the user requests, or otherwise in the language best suited to the task.
+Use the user's language for responses, generated stage and correction prompts, and record content unless the user requests another language. Keep command syntax, identifiers, and necessary technical terms unchanged. Follow later language preferences when the user changes them.
