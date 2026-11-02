@@ -1,0 +1,49 @@
+name: Release notes to Discord
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to post (for example v1.0.0)
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post release notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          TAG: ${{ github.event.release.tag_name || inputs.tag }}
+          WEBHOOK: ${{ secrets.DISCORD_RELEASES_WEBHOOK_URL }}
+        run: |
+          set -euo pipefail
+          if [ -z "$WEBHOOK" ]; then
+            echo "::error::DISCORD_RELEASES_WEBHOOK_URL is not set"
+            exit 1
+          fi
+          gh release view "$TAG" --repo "$REPO" --json name,tagName,url,body,publishedAt > release.json
+          jq '{
+            username: "Agent Skills Releases",
+            allowed_mentions: { parse: [] },
+            embeds: [{
+              author: { name: "Agent Skills" },
+              title: ((.name // "") | if length > 0 then . else $tag end | .[0:256]),
+              url: .url,
+              description: ((.body // "") | if length > 4000 then .[0:3990] + "\n…" else . end),
+              color: 13123631,
+              timestamp: .publishedAt,
+              footer: { text: $tag }
+            }]
+          }' --arg tag "$TAG" release.json > payload.json
+          curl --fail-with-body --silent --show-error \
+            -H "Content-Type: application/json" \
+            --data @payload.json \
+            "$WEBHOOK"
+          echo "Posted $TAG to Discord."
