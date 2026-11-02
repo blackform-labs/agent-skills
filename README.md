@@ -49,7 +49,3 @@ If your agent does not support installing skills, you can copy the contents of [
 - Add scripts, references, and assets only when the workflow needs them.
 - Do not commit credentials, private project data, or generated orchestration records.
 - Check third-party licensing and attribution before adding material created elsewhere.
-
-## Release notifications
-
-The release workflow posts published release notes to Discord. Set the repository Actions secret `DISCORD_RELEASES_WEBHOOK_URL` to the webhook URL for the desired channel; never commit the URL. The webhook's configured avatar is used. A repository member can also run the workflow manually with an existing release tag to repost its notes. The workflow must be on the default branch before it can be run manually.
