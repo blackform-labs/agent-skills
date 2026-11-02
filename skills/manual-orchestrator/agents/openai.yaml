@@ -1,0 +1,3 @@
+interface:
+  display_name: "Manual Orchestrator"
+  short_description: "Coordinate staged work across fresh chats"
