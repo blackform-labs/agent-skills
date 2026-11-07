@@ -34,7 +34,7 @@ In an agent session where the skill is available, start the workflow with:
 init manual-orchestrator
 ```
 
-Include your objective in the same message, or provide it when asked. This is a chat instruction, not a terminal command. You can also explicitly invoke the skill using your agent's supported syntax, such as `$manual-orchestrator init` in Codex or `/manual-orchestrator init` in Claude Code. The skill follows your language for its responses and prompts unless you request another language.
+Include your objective in the same message, or provide it when asked. This is a chat instruction, not a terminal command. You can also explicitly invoke the skill using your agent's supported syntax, such as `$manual-orchestrator init` in Codex or `/manual-orchestrator init` in Claude Code. The skill follows your language for conversation and the project record. All generated prompts are in English, including stage prompts, corrections, and handover prompts, even when you write in another language.
 
 The orchestrator writes a project-local record and prepares one stage prompt at a time. You open each new worker session, run the prompt, and return its result to the orchestrator. Corrections stay in the same worker session. Validation distinguishes reported work, verified evidence, and human acceptance.
 
