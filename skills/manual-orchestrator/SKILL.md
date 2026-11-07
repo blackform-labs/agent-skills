@@ -1,6 +1,6 @@
 ---
 name: manual-orchestrator
-description: Coordinate staged work through fresh chats with user-carried prompts and validated handoffs. Use for manual orchestration or “init manual-orchestrator”.
+description: Coordinate staged work through fresh chats with user-carried prompts and validated handoffs. Use for manual orchestration, “init manual-orchestrator”, or “manual-orchestrator hand over” to transfer the orchestrator to a fresh chat.
 ---
 
 # Manual Orchestrator
@@ -17,7 +17,17 @@ Treat `init manual-orchestrator` and invocation of this skill with `init` as req
 2. Locate an existing record for this objective before creating one. Respect the project's existing planning or handover conventions; otherwise use `<project-root>/orchestration/<short-objective>.md`. Without a project, use the current working directory. Preserve unrelated files and do not overwrite another effort's record. Ask the user only when multiple existing records cannot be distinguished.
 3. On resumption, read the record and verify relevant current artifacts or state before relying on prior conclusions. Retain decisions and authorization boundaries; distinguish recorded history from current evidence.
 4. Name the orchestrator session `ORQ · <short objective>` using an available title tool. Otherwise, suggest the title and a documented command only if confirmed for this interface; never assume that a built-in command can be invoked by the agent. Do not create a session to name it.
-5. Outline appropriately sized stages with observable completion criteria. Persist the record, then present only the current stage's prompt. The user may steer the stage plan or authorize a different order.
+5. For a new effort, outline appropriately sized stages with observable completion criteria. Persist the record, then present only the current stage's prompt. On resumption, preserve the existing plan and continue from the recorded next action, including waiting for a worker result or human decision. The user may steer the stage plan or authorize a different order.
+
+## Orchestrator handover
+
+Treat `manual-orchestrator hand over`, `manual-orchestrator handover`, and invocation of this skill with `hand over` or `handover` as requests to transfer the current orchestration to a fresh chat. These are chat instructions. The user opens the destination chat and carries the prompt there.
+
+1. Identify the active objective and its record from this chat. If neither this chat nor an identified record establishes an objective, ask which effort to transfer. Update the existing record using Project record below; create it under Start or resume only if the known effort has none.
+2. Save the exact stopping point: current stage and revision, last prompt issued and whether its result arrived, validation completed or still pending, unresolved human decisions or blockers, and the next action with who must take it. Preserve the current plan, language preference, authorization boundaries, and known worker chat references. Save any received result or evidence needed for pending validation in the record or a linked project-local artifact, omitting secrets; the destination must not depend on access to this chat.
+3. Read back the saved handover and check that its referenced artifacts exist. Mark missing evidence explicitly. A handover does not advance a stage or change its validation outcome. If saving fails, report the limitation and provide a clearly labeled inline fallback; do not claim it was persisted.
+4. Return one copy-ready continuation prompt in the user's language. Include the skill invocation, objective, absolute project and record paths, stopping point, exact next action, and suggested title `ORQ · <short objective>`. Instruct the destination to act as the orchestrator, read the skill and record, verify relevant current state, and resume through Start or resume. It must retain pending validation and human decisions, and prepare any correction prompt for the user to carry to the existing worker chat. Include the loaded skill's path when available; if the record could not be saved, embed the fallback state instead of relying on the record path.
+5. Ask the user to paste the prompt into a fresh orchestrator chat and bring future worker results there. End this turn after the handover; do not issue another stage prompt or create, archive, or close chats as part of this command.
 
 ## Stage loop
 

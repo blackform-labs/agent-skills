@@ -38,6 +38,14 @@ Include your objective in the same message, or provide it when asked. This is a 
 
 The orchestrator writes a project-local record and prepares one stage prompt at a time. You open each new worker session, run the prompt, and return its result to the orchestrator. Corrections stay in the same worker session. Validation distinguishes reported work, verified evidence, and human acceptance.
 
+When the orchestrator chat gets long, ask it to prepare a handover:
+
+```text
+manual-orchestrator hand over
+```
+
+`manual-orchestrator handover` also works, as does invoking the skill with `hand over`. The orchestrator saves the current stage, pending results or decisions, and next action in the project record, then gives you a continuation prompt. Open a fresh orchestrator chat with access to the same project and paste that prompt. Continue returning worker results there; existing worker chats stay in use for corrections.
+
 Orchestrator and worker sessions can use different CLIs. The skill uses a goal command such as `/goal` only when the worker interface is known to support it; otherwise it provides a normal prompt. Session renaming also depends on the interface. Agent support, skill discovery, and command availability vary by product and version.
 
 If your agent does not support installing skills, you can copy the contents of [SKILL.md](skills/manual-orchestrator/SKILL.md) into a new session as instructions, followed by your objective. The session still needs suitable file access to maintain the project record.
