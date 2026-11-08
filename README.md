@@ -7,6 +7,7 @@ A collection of reusable skills for agent-assisted work. Each skill lives in its
 | Skill | Purpose |
 | --- | --- |
 | [manual-orchestrator](skills/manual-orchestrator/SKILL.md) | Coordinate a staged objective across fresh chats, with user-carried prompts, evidence-based validation, and a local handover record. |
+| [product-orchestrator](skills/product-orchestrator/SKILL.md) | Coordinate product work through EGM, UI Delivery with Stitch, implementation, and verification, with saved decisions and stage handoffs. |
 
 ## Install
 
@@ -49,6 +50,22 @@ manual-orchestrator hand over
 Orchestrator and worker sessions can use different CLIs. The skill uses a goal command such as `/goal` only when the worker interface is known to support it; otherwise it provides a normal prompt. Session renaming also depends on the interface. Agent support, skill discovery, and command availability vary by product and version.
 
 If your agent does not support installing skills, you can copy the contents of [SKILL.md](skills/manual-orchestrator/SKILL.md) into a new session as instructions, followed by your objective. The session still needs suitable file access to maintain the project record.
+
+## Use product-orchestrator
+
+Start with an objective and a project directory:
+
+```text
+init product-orchestrator
+```
+
+The coordinator selects the stages the work needs, prepares one worker prompt at a time, and validates the returned results. You open the worker chats and carry their results back. It saves progress in an initiative-specific project record so another coordinator chat can resume. Use `product-orchestrator resume`, `product-orchestrator status`, or `product-orchestrator hand over` for continuation, status, or transfer to a fresh chat. These are chat instructions, not terminal commands.
+
+The workflow can use EGM for concept and technical design, UI Delivery with Stitch for interface work, and suitable implementation and verification skills. It reuses applicable briefs and decisions, skips unnecessary stages, and keeps human decisions separate from technical checks. A change to an earlier input reopens the affected downstream work.
+
+EGM, UI Delivery, and Stitch are separate dependencies, checked when their stage is needed. They are not installed by this skill. If an installed UI Delivery version lacks Stitch guidance, the coordinator includes that work in the stage prompt. The worker must have the required tools and inspect the generated designs. Missing capabilities are reported before dependent work continues.
+
+Conversation and records follow your language; generated handoff prompts are in English and retain your artifact language preferences. This is a manual coordination workflow. It does not start background agents or launch chats. `manual-orchestrator` remains a separate skill with its existing workflow.
 
 ## Repository conventions
 
