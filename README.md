@@ -6,6 +6,7 @@ A collection of reusable skills for agent-assisted work. Each skill lives in its
 
 | Skill | Purpose |
 | --- | --- |
+| [herd-orchestrator](skills/herd-orchestrator/SKILL.md) | Coordinate staged work through Herdr, with worker sessions, validation, and a local handover record. |
 | [manual-orchestrator](skills/manual-orchestrator/SKILL.md) | Coordinate a staged objective across fresh chats, with user-carried prompts, evidence-based validation, and a local handover record. |
 | [product-orchestrator](skills/product-orchestrator/SKILL.md) | Coordinate product work through EGM, UI Delivery with Stitch, implementation, and verification, with saved decisions and stage handoffs. |
 
@@ -26,6 +27,12 @@ npx skills add blackform-labs/agent-skills -g
 The CLI requires Node.js 22.20 or later. To list available skills without installing them, run `npx skills add blackform-labs/agent-skills --list`. Check for updates with `npx skills check` and update CLI-managed installations with `npx skills update`. Restart the agent or start a new session if a newly installed skill is not discovered.
 
 **Codex alternative:** ask Codex to run `$skill-installer` for `https://github.com/blackform-labs/agent-skills/tree/main/skills/manual-orchestrator`. Skills installed this way are separate from CLI-managed installations and do not update automatically.
+
+## Use herd-orchestrator
+
+Start with `init herd-orchestrator` and an objective. The orchestrator uses Herdr's `hc` CLI to start interactive workers, deliver tasks, and collect their results. It validates each stage and maintains a project record. It pauses when a decision, permission, or human acceptance is needed. Use `herd-orchestrator hand over` to transfer the orchestrator to a new session while retaining worker references and pending decisions.
+
+Herdr and the selected worker CLI must be available. The orchestrator can use the CLI's configured model and effort or pass supported choices supplied for the work. Generated worker and handover prompts are in English; conversation and records follow your language.
 
 ## Use manual-orchestrator
 
