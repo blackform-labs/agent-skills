@@ -31,7 +31,7 @@ While workers run, keep the screen quiet. After each step, report one line: step
 
 | User says | Do |
 |---|---|
-| `init herd-orchestrator` + objective | Setup, then Plan |
+| `init herd-orchestrator` + objective, or a path to a brief | Setup, then Plan |
 | `herd-orchestrator approve` | Approve the current plan draft |
 | `herd-orchestrator run` | Run the campaign (also right after approval) |
 | `herd-orchestrator roles` | Show or change the role selection |
@@ -45,7 +45,7 @@ While workers run, keep the screen quiet. After each step, report one line: step
 1. Check `hc --version`. Do not start, stop or restart the shared Herdr core.
 2. Resolve the project folder (absolute path). If it is not a Git repository, run `git init`. If the working tree has uncommitted changes, stop and ask.
 3. Create whatever is missing; never overwrite existing files:
-   - `docs/BRIEF.md`: written by you from the user's objective (problem, users, scope, constraints, stack if known, what "done" means). Show it to the user only if something essential is missing.
+   - `docs/BRIEF.md`. If the user names an existing file as the brief (a design draft, spec or brief), copy it there byte for byte: do not summarize, translate or rewrite it, and record its source path in **Campaign**. If it says parts are drafts, proposed or not yet approved, list those parts when you present the plan. Otherwise write it from the user's objective (problem, users, scope, constraints, stack if known, what "done" means), and show it only if something essential is missing.
    - `AGENTS.md` from `SKILL_DIR/assets/AGENTS.md`, and `CLAUDE.md` containing `@AGENTS.md`.
    - `.shogun/plan.schema.json` and `.shogun/verdict.schema.json` from `SKILL_DIR/assets/`.
    - `.shogun/roles/gunshi.md`, `samurai.md` and `metsuke.md` from `SKILL_DIR/assets/roles/`: each role's instructions.
@@ -129,7 +129,7 @@ Wait with `hc wait <t> --timeout 600`, repeated until the worker is not `working
 # Campaign: <short objective>
 
 ## Campaign
-- Objective / Project / Worktree / Branch / Approved plan commit
+- Objective / Brief source / Project / Worktree / Branch / Approved plan commit
 - Mode / User language / Roles / Folder trust
 
 ## Now
