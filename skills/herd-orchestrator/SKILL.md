@@ -37,6 +37,7 @@ While workers run, keep the screen quiet. After each step, report one line: step
 | `herd-orchestrator roles` | Show or change the role selection |
 | `herd-orchestrator status` | Summarize the campaign record and live workers |
 | `herd-orchestrator answer …` | Record the answer, then resume |
+| `herd-orchestrator resume` | Resume |
 | `herd-orchestrator hand over` | Handover |
 
 ## Setup
@@ -48,9 +49,9 @@ While workers run, keep the screen quiet. After each step, report one line: step
    - `AGENTS.md` from `SKILL_DIR/assets/AGENTS.md`, and `CLAUDE.md` containing `@AGENTS.md`.
    - `.shogun/plan.schema.json` and `.shogun/verdict.schema.json` from `SKILL_DIR/assets/`.
    - `.shogun/roles/gunshi.md`, `samurai.md` and `metsuke.md` from `SKILL_DIR/assets/roles/`: each role's instructions.
-   - `.shogun/progress.md`, `.shogun/questions.md` (one heading each), and the lines `.shogun/evidence/`, `.shogun/campaign.md` and `.shogun/roles.json` in `.gitignore`.
+   - `.shogun/campaign.md` (the record), `.shogun/progress.md`, `.shogun/questions.md` (one heading each), and the lines `.shogun/evidence/`, `.shogun/campaign.md` and `.shogun/roles.json` in `.gitignore`.
 4. Choose the roles (see Roles), writing `PROJECT/.shogun/roles.json`.
-5. Commit these files on the current branch with the message `chore: herd-orchestrator setup`. This and the plan commit are the only commits outside the campaign branch.
+5. Commit these files on the current branch with the message `chore: herd-orchestrator setup`; the Git-ignored `campaign.md` and `roles.json` stay uncommitted. This and the plan commit are the only commits outside the campaign branch.
 
 ## Plan
 
@@ -63,7 +64,7 @@ While workers run, keep the screen quiet. After each step, report one line: step
 
 ## Run
 
-1. **Campaign worktree.** Create once: `git -C PROJECT worktree add ../<repo>-campaign-<id> -b campaign/<id>`. `WT` is that absolute path. Every worker and command below runs in `WT`. Create `WT/.shogun/campaign.md` (see Campaign record).
+1. **Campaign worktree.** Create once: `git -C PROJECT worktree add ../<repo>-campaign-<id> -b campaign/<id>`. `WT` is that absolute path. Every worker and command below runs in `WT`. Record the worktree and branch in the campaign record.
 2. **Prerequisites and setup.** Run `prerequisites`, then `setup` (before the first step, or right after `setup_after`'s commit), each with `hc run --name <short> --cwd WT -- sh -c '<command>'` on the host, `hc wait` until it exits and `hc rm` it. Plan approval covers exactly these commands. Commit setup changes as `chore: setup`.
 3. **For each step** in plan order whose status is `pending` and whose `depends_on` are all `done`:
    1. `hard_gate`: ask the user before starting.
@@ -122,7 +123,7 @@ Wait with `hc wait <t> --timeout 600`, repeated until the worker is not `working
 
 ## Campaign record
 
-`WT/.shogun/campaign.md` is the single source for resuming. Update it at each launch, verdict, decision and stop. It is Git-ignored so that a FAIL reset keeps it; the committed history is `.shogun/progress.md`:
+`PROJECT/.shogun/campaign.md` is the single source for resuming. Create it at setup and update it at each launch, verdict, decision and stop. It lives in the main checkout, outside the worktree where workers run, and is Git-ignored, so a FAIL reset never touches it; the committed history is `WT/.shogun/progress.md`:
 
 - objective, project, worktree, branch, approved plan commit, mode (unattended or attended), the user's language (the language of their own messages, not of prompts they paste), the role selection and whether folder trust was authorized;
 - current step, attempt, status and next actor;
@@ -139,11 +140,25 @@ Wait with `hc wait <t> --timeout 600`, repeated until the worker is not `working
 - Clean up only terminals this campaign started. Never `hc server stop` or `restart`.
 - Write worker prompts in English. Talk to the user in their language.
 
-## Resume and handover
+## Resume
 
-**Resume.** Read `campaign.md`, `plan.json` and `hc ls`. If a worker for the current attempt is live, wait on it; never launch a duplicate. When delivery is uncertain, `hc read` before anything else.
+On `herd-orchestrator resume`, or a continuation prompt, act as the orchestrator:
 
-**Handover.** Update `campaign.md` and read it back. Give the user one English continuation prompt: invoke herd-orchestrator to resume, with absolute project, worktree, record and `roles.json` paths, the current step and the next action. Stop after the handover.
+1. Read this skill, `PROJECT/.shogun/campaign.md`, the plan (`WT/.shogun/plan.json` once the campaign runs, otherwise `PROJECT/.shogun/plan.json`) and `PROJECT/.shogun/roles.json`.
+2. Reconcile the record with the current state before acting: `git -C WT log --oneline`, the evidence folder of the current attempt, and `hc ls --all`. The current state wins; record any difference.
+3. A live worker of the current attempt is waited on, never relaunched. Uncertain delivery: `hc read` first. A finished worker with its evidence already written continues from the next gate (verify, review or decide).
+4. Keep pending human decisions pending. Keep the role selection, trust authorization, mode and language.
+5. Continue the Run loop from the recorded next action.
+
+## Handover
+
+`herd-orchestrator hand over` or `handover` transfers the campaign to a fresh orchestrator session. Suggest one yourself between steps when this session's context is getting long.
+
+1. Identify the campaign from this session or its record. If neither establishes one, ask which campaign to transfer.
+2. Update `campaign.md` with the exact stopping point: current step and attempt; each live worker's name, terminal and status (they keep running during the handover); the last completed gate and the next one (verify, review, decide, commit); pending human decisions or blockers; the next action and who takes it. Keep the plan commit, roles, trust authorization, mode and language. Evidence stays in the evidence folder; the record must not depend on this session's memory.
+3. Read the record back and check that the files it references exist: worktree (once created), plan, `roles.json`, the current evidence folder. Mark anything missing. If saving fails, say so and put the state inline in the prompt instead.
+4. Return one continuation prompt in English, **on a single line** (multi-line pastes can be cut at the first line break), containing: the skill name and "resume", the objective, the absolute project, worktree, record and `roles.json` paths, the stopping point, the next action, the user's language, and the title `ORQ · <short objective>`. It instructs the new session to follow Resume.
+5. Tell the user to open a new session in the same Herdr space and paste it. Stop here: do not advance the step, kill workers, or wait on them. New worker panes will open beside the new orchestrator.
 
 ## Panes
 
