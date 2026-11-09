@@ -15,7 +15,7 @@ Run a development campaign with Herdr. A planner (Gunshi) turns a brief into a s
 
 Planning, implementation, verification, review, fixes and commits run without asking. Stop and ask the user only for:
 
-1. **Role selection**, once per campaign (see Roles).
+1. **Role selection and folder trust**, once per campaign (see Roles and Startup).
 2. **Plan approval**, once, plus any `required` planning question.
 3. A step with `hard_gate: true`, before it starts.
 4. A step's `human_tasks`, after its commit.
@@ -55,8 +55,8 @@ While workers run, keep the screen quiet. After each step, report one line: step
 ## Plan
 
 1. Launch Gunshi:
-   `python3 SKILL_DIR/scripts/launch_role.py PROJECT/.shogun/roles.json gunshi gunshi-<short> PROJECT "Plan from docs/BRIEF.md. Use <samurai cli> for defaults.worker and <metsuke cli> for defaults.reviewer."`
-   Wait with `hc wait gunshi-<short> --timeout 900`, repeated, until it is not `working`.
+   `python3 SKILL_DIR/scripts/launch_role.py PROJECT/.shogun/roles.json gunshi gunshi-<short> PROJECT [--trust] "Plan from docs/BRIEF.md. Use <samurai cli> for defaults.worker and <metsuke cli> for defaults.reviewer."`
+   Handle its startup result (see Startup), then wait with `hc wait gunshi-<short> --timeout 900`, repeated, until it is not `working`.
 2. Run `python3 SKILL_DIR/scripts/validate_plan.py PROJECT/.shogun/plan.json`. On errors, send them to the same Gunshi with `hc send` and wait again (at most 3 rounds, then ask the user).
 3. Present to the user in one message: the step list (ID, title, `needs_approval`/`hard_gate`), `setup` commands, `human_tasks`, and the questions marked `required` in `.shogun/questions.md`. Ask for approval and answers together.
 4. Changes or answers go to the same Gunshi, then validate again. On approval: kill and remove Gunshi, commit the plan and documents on the current branch (`docs: approved plan`), record the commit hash, and start Run without asking again.
@@ -68,16 +68,16 @@ While workers run, keep the screen quiet. After each step, report one line: step
 3. **For each step** in plan order whose status is `pending` and whose `depends_on` are all `done`:
    1. `hard_gate`: ask the user before starting.
    2. Record the step as running in `campaign.md` (not in `plan.json`). Launch a fresh Samurai:
-      `python3 SKILL_DIR/scripts/launch_role.py PROJECT/.shogun/roles.json samurai s-<id>-a<n> WT "Implement step <ID> of .shogun/plan.json. Attempt <n>. Evidence folder: .shogun/evidence/<ID>/a<n>/"`
-      Record its terminal. The task is part of the launch command, so it cannot be lost while the CLI starts. If the worker stops at a startup dialog (for example folder trust), `hc read` it and answer with `hc keys`, never `--force`.
+      `python3 SKILL_DIR/scripts/launch_role.py PROJECT/.shogun/roles.json samurai s-<id>-a<n> WT [--trust] "Implement step <ID> of .shogun/plan.json. Attempt <n>. Evidence folder: .shogun/evidence/<ID>/a<n>/"`
+      Record its terminal and handle its startup result (see Startup). The task is part of the launch command, so it cannot be lost while the CLI starts.
    3. Wait: `hc wait <t> --timeout 900`, repeated. A timeout is a check-in. Status `blocked`, or a new open question in `.shogun/questions.md`: ask the user.
    4. **Verify** on the host:
       `hc run --bg --no-notify --name v-<id>-a<n> --cwd WT -- python3 SKILL_DIR/scripts/run_verify.py WT <ID> .shogun/evidence/<ID>/a<n>/verify.log`
       then `hc wait v-<id>-a<n>` until it exits, and `hc rm v-<id>-a<n>`. The result is the last line of `verify.log`: `# result: PASS`, or `FAIL`, which skips review and goes to **Fix**. A log without a result line means verification did not finish: rerun it once, then ask.
    5. **Scope:** create the evidence folder if needed, then `python3 SKILL_DIR/scripts/check_scope.py WT <ID> > WT/.shogun/evidence/<ID>/a<n>/scope.txt`.
    6. **Review:** launch a fresh Metsuke:
-      `python3 SKILL_DIR/scripts/launch_role.py PROJECT/.shogun/roles.json metsuke m-<id>-a<n> WT "Review step <ID>. Evidence folder: .shogun/evidence/<ID>/a<n>/"`
-      Wait for it. Validate `verdict.json` with `python3 SKILL_DIR/scripts/validate_verdict.py <path>`. Missing or invalid: ask the same Metsuke once, then treat as INCONCLUSIVE and ask the user. `git -C WT status --porcelain` must be unchanged by the review.
+      `python3 SKILL_DIR/scripts/launch_role.py PROJECT/.shogun/roles.json metsuke m-<id>-a<n> WT [--trust] "Review step <ID>. Evidence folder: .shogun/evidence/<ID>/a<n>/"`
+      Handle its startup result, then wait for it. Validate `verdict.json` with `python3 SKILL_DIR/scripts/validate_verdict.py <path>`. Missing or invalid: ask the same Metsuke once, then treat as INCONCLUSIVE and ask the user. `git -C WT status --porcelain` must be unchanged by the review.
    7. **Decide:**
       - **PASS** = verdict `PASS`, verify exit 0, and every out-of-scope path justified in the Samurai's report. Kill and remove the Samurai and Metsuke. Restore `.shogun/plan.json` and `.shogun/progress.md` from HEAD (`git -C WT checkout HEAD -- <file>`), then set the step's status to `done` and append a progress entry (date, step, attempts, the Samurai's three-line report), then `git -C WT add -A` and commit `<ID>: <title>` with trailers `Campaign: <id>`, `Attempts: <n>`, `Verdict: PASS`. If the step has `human_tasks`, ask now and record the answers in progress. Continue to the next step at once.
       - **Fix** (NEEDS_IMPROVEMENT, failed verify, or unjustified scope): if `n < max_retries`, kill the Metsuke and send the same Samurai one message: the paths of `verify.log`, `scope.txt` and `verdict.json`, and the next evidence folder `a<n+1>`. Repeat from Wait. Otherwise stop and ask.
@@ -102,11 +102,25 @@ Each campaign chooses, per role, the CLI (`codex` or `claude`), the model and th
 
 `launch_role.py` builds every worker command, so permissions stay fixed per CLI: Codex runs with `--no-daemon -s workspace-write -a never` (no network, no approval prompts) and Claude Code with `--permission-mode auto`. The file is Git-ignored and sits outside the campaign worktree, so workers cannot change it.
 
+## Startup
+
+`launch_role.py` launches the worker, shows it in a pane to the right of the orchestrator (`--no-show` skips that), and watches it until the agent reports a status. It prints JSON with `terminal` and `startup`:
+
+| `startup` (exit code) | Meaning and action |
+|---|---|
+| `ready` (0), `trust_answered` (0) | Running. Continue. |
+| `trust_dialog` (3) | The CLI asks whether to trust the folder. Ask the user, unless trust was already authorized. |
+| `no_status` (4), `exited` (4) | Read `screen_tail` and `hc read`. Fix what you can (a wrong model or effort is a role problem); otherwise ask. |
+
+**Folder trust.** Codex and Claude Code ask once per folder whether to trust it, and stay silent until someone answers. A campaign worktree inherits Codex's trust from the main repository, but Claude Code asks again for each new folder. At setup, ask the user once, in the role-selection message, whether workers may trust the project folder and its campaign worktrees. If yes, record it and pass `--trust` to every launch, which answers only that dialog with Enter. If no, a `trust_dialog` result means asking the user to answer it in the worker's pane.
+
+Never press keys on any other dialog. A worker that stays without status is a blocker: tell the user instead of waiting.
+
 ## Campaign record
 
 `WT/.shogun/campaign.md` is the single source for resuming. Update it at each launch, verdict, decision and stop. It is Git-ignored so that a FAIL reset keeps it; the committed history is `.shogun/progress.md`:
 
-- objective, project, worktree, branch, approved plan commit, mode (unattended or attended), the user's language, and the role selection;
+- objective, project, worktree, branch, approved plan commit, mode (unattended or attended), the user's language, the role selection and whether folder trust was authorized;
 - current step, attempt, status and next actor;
 - live terminal names and IDs, evidence paths;
 - verdict per attempt, decisions, user answers, open blockers.
@@ -126,6 +140,6 @@ Each campaign chooses, per role, the CLI (`codex` or `claude`), the model and th
 
 **Handover.** Update `campaign.md` and read it back. Give the user one English continuation prompt: invoke herd-orchestrator to resume, with absolute project, worktree, record and `roles.json` paths, the current step and the next action. Stop after the handover.
 
-## Showing workers
+## Panes
 
-Workers run without a visible pane. If the user wants to watch one, check `herdr-app ls` and run `herdr-app do terminal.keep --terminal <t> --place right`. Placement never blocks the campaign.
+Each worker appears in a pane to the right of the orchestrator while it works; killing and removing it after its step closes the pane. If placement fails (no Herdr window, orchestrator outside Herdr), the campaign continues; the user can show a worker later with `herdr-app do terminal.keep --terminal <t> --place right`.
