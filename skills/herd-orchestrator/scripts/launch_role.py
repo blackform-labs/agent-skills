@@ -174,11 +174,14 @@ def show_pane(term):
             if pane:
                 subprocess.run(["herdr-app", "do", "pane.focus", "--pane", pane],
                                capture_output=True, timeout=10)
-        proc = subprocess.run(["herdr-app", "do", "terminal.keep", "--terminal", term,
-                               "--place", "right"], capture_output=True, text=True, timeout=10)
-        if proc.returncode != 0:
-            return f"not shown: {proc.stderr.strip() or proc.stdout.strip()}"
-        return json.loads(proc.stdout).get("pane", "shown")
+        # The window learns about a new terminal a moment after hc creates it: retry briefly.
+        for _ in range(10):
+            proc = subprocess.run(["herdr-app", "do", "terminal.keep", "--terminal", term,
+                                   "--place", "right"], capture_output=True, text=True, timeout=10)
+            if proc.returncode == 0 and '"error"' not in proc.stdout:
+                return json.loads(proc.stdout).get("pane", "shown")
+            time.sleep(1)
+        return f"not shown: {(proc.stderr or proc.stdout).strip()}"
     except Exception as e:  # placement is a convenience; report and continue
         return f"not shown: {e}"
 
@@ -217,8 +220,8 @@ def main():
         sys.stderr.write(proc.stderr or proc.stdout)
         return 1
     term = json.loads(proc.stdout).get("address", a.name)
-    shown = "not requested" if a.no_show else show_pane(term)
     startup, last = watch_startup(term, a.trust)
+    shown = "not requested" if a.no_show else show_pane(term)
     out = {"terminal": term, "name": a.name, "startup": startup, "shown": shown}
     if startup not in ("ready", "trust_answered"):
         out["screen_tail"] = tail(last)
