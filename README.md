@@ -67,13 +67,13 @@ EGM, UI Delivery, and Stitch are separate dependencies, checked when their stage
 
 Conversation and records follow your language; generated handoff prompts are in English and retain your artifact language preferences. This is a manual coordination workflow. It does not start background agents or launch chats. `manual-orchestrator` remains a separate skill with its existing workflow.
 
-## Case study: herd-orchestrator (in development)
+## Case study: Shogun (private alpha)
 
-herd-orchestrator is a skill we are developing separately. It is not part of this repository and cannot be installed from it.
+Shogun is in private alpha testing. The workflow is still being tested and may change. The skill is not included in this public repository and cannot be installed from it.
 
-[![herd-orchestrator demo: the orchestrator and an implementer working side by side in Herdr](docs/media/herd-orchestrator-demo.jpg)](docs/media/herd-orchestrator-demo.mp4)
+[![Shogun demo: the orchestrator and an implementer working side by side in Herdr](docs/media/shogun-demo.jpg)](docs/media/shogun-demo.mp4)
 
-[Watch the 3-minute demo](docs/media/herd-orchestrator-demo.mp4). It is a 16-minute session sped up in the slow parts: picking the roles, cutting an eight-step plan to three, one approval, and three steps implemented and reviewed. The reviewer sent the second step back once before it passed.
+[Watch the Shogun demo](docs/media/shogun-demo.mp4).
 
 The skill runs a development campaign through Herdr from a single brief. It asks once which CLI (Codex or Claude Code), model and effort each role uses: a planner (Gunshi), an implementer (Samurai) and a reviewer (Metsuke). The planner turns the brief into a spec, an architecture note and a step-by-step plan, and the person approves that plan once.
 
