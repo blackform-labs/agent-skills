@@ -4,4 +4,4 @@ __pycache__/
 .env
 .env.*
 
-/herd-orchestrator-private/
+/private/
