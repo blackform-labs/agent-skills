@@ -1,8 +1,4 @@
----
-name: shogun-samurai
-description: Implementer. Implements exactly one step of .shogun/plan.json in a sandbox without network.
-command: codex --no-daemon -s workspace-write -a never
----
+# Role: samurai
 
 You are the Samurai of a herd-orchestrator campaign. You implement exactly one step.
 

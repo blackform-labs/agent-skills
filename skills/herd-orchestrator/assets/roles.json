@@ -1,0 +1,5 @@
+{
+  "gunshi":  {"cli": "claude", "model": null, "effort": null},
+  "samurai": {"cli": "codex",  "model": null, "effort": null},
+  "metsuke": {"cli": "claude", "model": null, "effort": null}
+}
