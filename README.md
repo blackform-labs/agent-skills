@@ -36,7 +36,9 @@ After approval, the campaign runs in its own Git worktree and branch. Each step 
 
 The campaign stops for you only when it needs a person: plan approval, a `hard_gate` step, `human_tasks`, a worker waiting on a permission or question, a step that runs out of retries, or anything the approved plan does not cover. It never pushes or merges. Use `herd-orchestrator status` to check progress and `herd-orchestrator hand over` to continue in a new session.
 
-You need Herdr (`hc`) and the CLIs you choose. The defaults are Claude Code for the planner and reviewer and Codex for the implementer, each with its configured model. Codex workers run in their workspace sandbox without approval prompts; Claude Code workers run in auto permission mode. The selection is saved in the project's `.shogun/roles.json`, and `herd-orchestrator roles` changes it for later launches.
+You need Herdr (`hc`) and the CLIs you choose. The defaults are Claude Code for the planner and reviewer and Codex for the implementer, each with its configured model. Codex workers run in their workspace sandbox without approval prompts; Claude Code workers run in auto permission mode. The selection is saved in the project's `.shogun/roles.json`, and `herd-orchestrator roles` changes it for later launches. The orchestrator shows the models and efforts each CLI offers on your machine, read from Codex's model cache and Claude Code's help, and rejects combinations a model does not support.
+
+Write each instruction to the orchestrator as a single line. In testing, a multi-line paste into Codex running inside Herdr was submitted at its first line break, so the remaining lines were lost.
 
 ## Use manual-orchestrator
 
