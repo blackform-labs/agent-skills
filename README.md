@@ -30,7 +30,7 @@ The CLI requires Node.js 22.20 or later. To list available skills without instal
 
 ## Use herd-orchestrator
 
-Start with `init herd-orchestrator` and describe what you want built, or give the path to a brief or design document you already have. The orchestrator writes the brief from your description, or copies your document unchanged, and asks you once which CLI (Codex or Claude Code), model and effort each role uses: the planner (Gunshi), the implementer (Samurai) and the reviewer (Metsuke). The planner then writes `docs/SPEC.md`, `docs/ARCHITECTURE.md` and `.shogun/plan.json`, and you approve the plan once.
+Start with `init herd-orchestrator` and describe what you want built, or give the path to a brief or design document you already have. Started in a folder that holds one (a Markdown file named like `brief`, `design`, `spec` or `prd`), it finds it without a path. The orchestrator writes the brief from your description, or copies your document unchanged, and asks you once which CLI (Codex or Claude Code), model and effort each role uses: the planner (Gunshi), the implementer (Samurai) and the reviewer (Metsuke). The planner then writes `docs/SPEC.md`, `docs/ARCHITECTURE.md` and `.shogun/plan.json`, and you approve the plan once.
 
 After approval, the campaign runs in its own Git worktree and branch. Each step gets a fresh implementer. The orchestrator then runs the step's verify commands on your machine and checks that the changes stay inside the step's paths. A reviewer on a different model judges every acceptance criterion. A passing step is committed and the next one starts. Failed checks go back to the same implementer, up to the plan's retry limit.
 

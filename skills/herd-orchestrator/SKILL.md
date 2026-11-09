@@ -31,7 +31,7 @@ While workers run, keep the screen quiet. After each step, report one line: step
 
 | User says | Do |
 |---|---|
-| `init herd-orchestrator` + objective, or a path to a brief | Setup, then Plan |
+| `init herd-orchestrator`, optionally with an objective or a brief file | Setup, then Plan |
 | `herd-orchestrator approve` | Approve the current plan draft |
 | `herd-orchestrator run` | Run the campaign (also right after approval) |
 | `herd-orchestrator roles` | Show or change the role selection |
@@ -43,15 +43,16 @@ While workers run, keep the screen quiet. After each step, report one line: step
 ## Setup
 
 1. Check `hc --version`. Do not start, stop or restart the shared Herdr core.
-2. Resolve the project folder (absolute path). If it is not a Git repository, run `git init`. If the working tree has uncommitted changes, stop and ask.
-3. Create whatever is missing; never overwrite existing files:
-   - `docs/BRIEF.md`. If the user names an existing file as the brief (a design draft, spec or brief), copy it there byte for byte: do not summarize, translate or rewrite it, and record its source path in **Campaign**. If it says parts are drafts, proposed or not yet approved, list those parts when you present the plan. Otherwise write it from the user's objective (problem, users, scope, constraints, stack if known, what "done" means), and show it only if something essential is missing.
+2. Find the brief and the project folder. If `docs/BRIEF.md` exists, it is the brief. Otherwise, without a named file or objective, look in the folder where you were started (top level and `docs/`) for Markdown files whose name contains `brief`, `design`, `spec` or `prd`, ignoring case and excluding `README`, `AGENTS` and `CLAUDE`. With exactly one candidate, use it as the brief and tell the user which file you took. With several, or none and no objective, ask in the role-selection message (see Roles), listing the candidates. If the brief came from a folder that is not a Git repository and already holds other files, propose a new project folder next to it (named after the product) in that same message instead of turning the folder into the project.
+3. Resolve the project folder (absolute path). If it is not a Git repository, run `git init`. If the working tree has uncommitted changes, stop and ask.
+4. Create whatever is missing; never overwrite existing files:
+   - `docs/BRIEF.md`. If the brief is an existing file (a design draft, spec or brief, named by the user or found in step 2), copy it there byte for byte: do not summarize, translate or rewrite it, and record its source path in **Campaign**. If it says parts are drafts, proposed or not yet approved, list those parts when you present the plan. Otherwise write it from the user's objective (problem, users, scope, constraints, stack if known, what "done" means), and show it only if something essential is missing.
    - `AGENTS.md` from `SKILL_DIR/assets/AGENTS.md`, and `CLAUDE.md` containing `@AGENTS.md`.
    - `.shogun/plan.schema.json` and `.shogun/verdict.schema.json` from `SKILL_DIR/assets/`.
    - `.shogun/roles/gunshi.md`, `samurai.md` and `metsuke.md` from `SKILL_DIR/assets/roles/`: each role's instructions.
    - `.shogun/campaign.md` (the record), `.shogun/progress.md`, `.shogun/questions.md` (one heading each), and the lines `.shogun/evidence/`, `.shogun/campaign.md` and `.shogun/roles.json` in `.gitignore`.
-4. Choose the roles (see Roles), writing `PROJECT/.shogun/roles.json`.
-5. Commit these files on the current branch with the message `chore: herd-orchestrator setup`; the Git-ignored `campaign.md` and `roles.json` stay uncommitted. This and the plan commit are the only commits outside the campaign branch.
+5. Choose the roles (see Roles), writing `PROJECT/.shogun/roles.json`.
+6. Commit these files on the current branch with the message `chore: herd-orchestrator setup`; the Git-ignored `campaign.md` and `roles.json` stay uncommitted. This and the plan commit are the only commits outside the campaign branch.
 
 ## Plan
 
