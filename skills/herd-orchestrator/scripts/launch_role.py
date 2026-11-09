@@ -163,16 +163,21 @@ def models(as_json):
     if as_json:
         print(json.dumps({"codex": cx, "claude": cl}, indent=1))
         return 0
-    print(f"codex  default: {cx['default_model'] or 'unknown'}, effort {cx['default_effort'] or 'model default'}")
+    print("| CLI | Model | Name | Efforts | Default effort |")
+    print("|---|---|---|---|---|")
+    d = cx["default_model"]
+    print(f"| codex | default: {d or 'unknown'} | | | {cx['default_effort'] or 'model default'} |")
     if not cx["models"]:
-        print("  (no local model cache; start codex once to create it)")
+        print("| codex | (no local model cache; start codex once) | | | |")
     for m in cx["models"]:
         if m["listed"]:
-            efforts = " ".join(m["efforts"])
-            print(f"  {m['slug']:18} {m['name'] or '':16} efforts: {efforts}  (default {m['default_effort']})")
-    print(f"claude default: {cl['default_model'] or 'set by Claude Code'}, effort {cl['default_effort'] or 'Claude Code default'}")
-    print(f"  aliases: {' '.join(cl['aliases']) or 'see claude --help'} (or a full model name)")
-    print(f"  efforts: {' '.join(cl['efforts'])}")
+            mark = " (default)" if m["slug"] == d else ""
+            print(f"| codex | `{m['slug']}`{mark} | {m['name'] or ''} | {', '.join(m['efforts'])} | {m['default_effort'] or ''} |")
+    efforts = ", ".join(cl["efforts"])
+    print(f"| claude | default: {cl['default_model'] or 'set by Claude Code'} | | {efforts} | {cl['default_effort'] or 'Claude Code default'} |")
+    for a in cl["aliases"]:
+        print(f"| claude | `{a}` | latest {a} model | {efforts} | |")
+    print("| claude | a full model name | | " + efforts + " | |")
     return 0
 
 
