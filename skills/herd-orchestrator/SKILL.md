@@ -112,7 +112,7 @@ Each campaign chooses, per role, the CLI (`codex` or `claude`), the model and th
 | `trust_dialog` (3) | The CLI asks whether to trust the folder. Ask the user, unless trust was already authorized. |
 | `no_status` (4), `exited` (4) | Read `screen_tail` and `hc read`. Fix what you can (a wrong model or effort is a role problem); otherwise ask. |
 
-**Folder trust.** Codex and Claude Code ask once per folder whether to trust it, and stay silent until someone answers. A campaign worktree inherits Codex's trust from the main repository, but Claude Code asks again for each new folder. At setup, ask the user once, in the role-selection message, whether workers may trust the project folder and its campaign worktrees. If yes, record it and pass `--trust` to every launch, which answers only that dialog with Enter. If no, a `trust_dialog` result means asking the user to answer it in the worker's pane.
+**Folder trust.** Codex and Claude Code ask once per folder whether to trust it, and stay silent until someone answers. A campaign worktree inherits Codex's trust from the main repository, but Claude Code asks again for each new folder. At setup, ask the user once, in the role-selection message, whether workers may trust the project folder and its campaign worktrees. If yes, record it and pass `--trust` to every launch, which selects only the dialog's trust option (Claude Code's default is "No, exit", so the script picks the option explicitly). If no, a `trust_dialog` result means asking the user to answer it in the worker's pane.
 
 Never press keys on any other dialog. A worker that stays without status is a blocker: tell the user instead of waiting.
 

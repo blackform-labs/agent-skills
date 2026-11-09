@@ -14,8 +14,10 @@ CLI flags, permissions and quoting are always the same:
   claude --permission-mode auto [--model MODEL] [--effort EFFORT] PROMPT
 
 After launching, the script watches startup until the agent reports a status:
-  - a folder-trust dialog is answered with Enter only with --trust (the user
-    authorized trusting the campaign folders); otherwise it is reported;
+  - a folder-trust dialog is answered only with --trust (the user authorized
+    trusting the campaign folders), by selecting its "trust" option: Enter for
+    Codex, Down+Enter for Claude Code, whose default is "No, exit". An
+    unrecognized layout, or no --trust, is reported instead;
   - the terminal is shown in a pane right of the orchestrator's pane unless
     --no-show (needs a running Herdr window; failure never blocks the launch).
 
@@ -140,24 +142,53 @@ def tail(text, n=12):
 def watch_startup(term, trust):
     """Wait until the agent reports a status, answering a trust dialog only when authorized."""
     deadline = time.time() + STARTUP_SECONDS
-    answered = False
+    attempts = 0
     last = ""
     while time.time() < deadline:
         info = hc_json("get", term) or {}
         if info.get("state") == "finished":
             return "exited", screen(term)
         if info.get("status"):
-            return ("trust_answered" if answered else "ready"), ""
+            return ("trust_answered" if attempts else "ready"), ""
         last = screen(term)
         if TRUST.search(last):
             if not trust:
                 return "trust_dialog", last
-            if not answered:
-                subprocess.run(["hc", "keys", term, "enter"], capture_output=True)
-                answered = True
-                deadline = time.time() + STARTUP_SECONDS
+            keys = trust_keys(last)
+            if keys is None or attempts >= 2:
+                return "trust_dialog", last
+            subprocess.run(["hc", "keys", term, *keys], capture_output=True)
+            attempts += 1
+            deadline = time.time() + STARTUP_SECONDS
+            time.sleep(3)  # hc types after ~3 s without other input
+            continue
         time.sleep(1)
     return "no_status", last
+
+
+YES = re.compile(r"trust and continue|yes,? i trust", re.I)
+NO = re.compile(r"\bno\b.*exit|back to", re.I)
+CURSOR = ("❯", "›", ">")
+
+
+def trust_keys(text):
+    """Keys that select the 'trust' option, or None when the layout is not recognized.
+
+    Codex lists "1. Trust and continue" first and selected; Claude Code lists
+    "No, exit" first and selected, then "Yes, I trust this folder". Enter alone
+    would make Claude exit, so the selected line decides the keys.
+    """
+    lines = [l.strip() for l in text.splitlines() if l.strip()]
+    options = [l for l in lines if YES.search(l) or NO.search(l)]
+    selected = next((l for l in options if l.startswith(CURSOR)), None)
+    if selected is None:
+        return None
+    if YES.search(selected):
+        return ["enter"]
+    yes_after = any(YES.search(l) for l in options[options.index(selected) + 1:])
+    if NO.search(selected) and yes_after and len(options) == 2:
+        return ["down", "enter"]
+    return None
 
 
 def show_pane(term):
