@@ -6,7 +6,7 @@ A collection of reusable skills for agent-assisted work. Each skill lives in its
 
 | Skill | Purpose |
 | --- | --- |
-| [herd-orchestrator](skills/herd-orchestrator/SKILL.md) | Coordinate staged work through Herdr, with worker sessions, validation, and a local handover record. |
+| [herd-orchestrator](skills/herd-orchestrator/SKILL.md) | Plan and run a development campaign through Herdr: a planner, an implementer per step, host verification and an independent reviewer, asking you only when a decision needs a person. |
 | [manual-orchestrator](skills/manual-orchestrator/SKILL.md) | Coordinate a staged objective across fresh chats, with user-carried prompts, evidence-based validation, and a local handover record. |
 | [product-orchestrator](skills/product-orchestrator/SKILL.md) | Coordinate product work through EGM, UI Delivery with Stitch, implementation, and verification, with saved decisions and stage handoffs. |
 
@@ -30,9 +30,13 @@ The CLI requires Node.js 22.20 or later. To list available skills without instal
 
 ## Use herd-orchestrator
 
-Start with `init herd-orchestrator` and an objective. The orchestrator uses Herdr's `hc` CLI to start interactive workers, deliver tasks, and collect their results. It validates each stage and maintains a project record. It pauses when a decision, permission, or human acceptance is needed. Use `herd-orchestrator hand over` to transfer the orchestrator to a new session while retaining worker references and pending decisions.
+Start with `init herd-orchestrator` and describe what you want built. The orchestrator writes a brief, installs three Herdr templates (`shogun-gunshi`, `shogun-samurai`, `shogun-metsuke`) if they are missing, and asks a planner to produce `docs/SPEC.md`, `docs/ARCHITECTURE.md` and `.shogun/plan.json`. You approve the plan once.
 
-Herdr and the selected worker CLI must be available. The orchestrator can use the CLI's configured model and effort or pass supported choices supplied for the work. Generated worker and handover prompts are in English; conversation and records follow your language.
+After approval, the campaign runs in its own Git worktree and branch. Each step gets a fresh implementer. The orchestrator then runs the step's verify commands on your machine and checks that the changes stay inside the step's paths. A reviewer on a different model judges every acceptance criterion. A passing step is committed and the next one starts. Failed checks go back to the same implementer, up to the plan's retry limit.
+
+The campaign stops for you only when it needs a person: plan approval, a `hard_gate` step, `human_tasks`, a worker waiting on a permission or question, a step that runs out of retries, or anything the approved plan does not cover. It never pushes or merges. Use `herd-orchestrator status` to check progress and `herd-orchestrator hand over` to continue in a new session.
+
+You need Herdr (`hc`), Codex CLI and Claude Code. By default the implementer runs Codex in its workspace sandbox without approvals, and the planner and reviewer run Claude Code in auto permission mode. To change a role's CLI, model or permissions, edit its template in `~/.config/herdr-core/templates/`.
 
 ## Use manual-orchestrator
 
