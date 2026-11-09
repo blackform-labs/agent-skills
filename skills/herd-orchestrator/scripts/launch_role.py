@@ -305,26 +305,44 @@ def trust_keys(text):
     return None
 
 
-def show_pane(term):
-    """Put the worker in a pane right of the orchestrator's pane; never raises."""
+def show_pane(term, cwd):
+    """Show the worker beside the orchestrator; never raises.
+
+    The first worker goes right of the orchestrator. While another live worker of
+    the same folder already has a pane in the orchestrator's tab, the new one goes
+    below the newest of them, so workers stack in a right-hand column.
+    """
     if not shutil.which("herdr-app"):
         return "herdr-app not found"
     try:
         me = os.environ.get("HC_TERMINAL_ID")
+        target, place = None, "right"
         if me:
             layout = json.loads(subprocess.run(["herdr-app", "ls"], capture_output=True,
                                                text=True, timeout=10).stdout)
-            pane = next((t["pane"] for sp in layout.get("spaces", []) for tb in sp.get("tabs", [])
-                         for t in tb.get("terminals", []) if t.get("terminal") == me), None)
-            if pane:
-                subprocess.run(["herdr-app", "do", "pane.focus", "--pane", pane],
-                               capture_output=True, timeout=10)
+            tab = next((tb.get("terminals", []) for sp in layout.get("spaces", [])
+                        for tb in sp.get("tabs", [])
+                        if any(t.get("terminal") == me for t in tb.get("terminals", []))), [])
+            panes = {t.get("terminal"): t.get("pane") for t in tab}
+            target = panes.get(me)
+            listing = hc_json("ls") or {}
+            here = os.path.realpath(cwd)
+            peers = [t["address"] for t in listing.get("terminals", [])
+                     if t.get("address") not in (me, term) and t.get("address") in panes
+                     and t.get("state") == "live"
+                     and os.path.realpath(t.get("cwd") or "") == here]
+            if peers:
+                newest = max(peers, key=lambda a: int(re.sub(r"\D", "", a) or 0))
+                target, place = panes[newest], "down"
+        if target:
+            subprocess.run(["herdr-app", "do", "pane.focus", "--pane", target],
+                           capture_output=True, timeout=10)
         # The window learns about a new terminal a moment after hc creates it: retry briefly.
         for _ in range(10):
             proc = subprocess.run(["herdr-app", "do", "terminal.keep", "--terminal", term,
-                                   "--place", "right"], capture_output=True, text=True, timeout=10)
+                                   "--place", place], capture_output=True, text=True, timeout=10)
             if proc.returncode == 0 and '"error"' not in proc.stdout:
-                return json.loads(proc.stdout).get("pane", "shown")
+                return f"{place}: {json.loads(proc.stdout).get('pane', 'shown')}"
             time.sleep(1)
         return f"not shown: {(proc.stderr or proc.stdout).strip()}"
     except Exception as e:  # placement is a convenience; report and continue
@@ -368,7 +386,7 @@ def main():
         return 1
     term = json.loads(proc.stdout).get("address", a.name)
     startup, last = watch_startup(term, a.trust)
-    shown = "not requested" if a.no_show else show_pane(term)
+    shown = "not requested" if a.no_show else show_pane(term, a.cwd)
     out = {"terminal": term, "name": a.name, "startup": startup, "shown": shown}
     if startup not in ("ready", "trust_answered"):
         out["screen_tail"] = tail(last)

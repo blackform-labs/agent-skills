@@ -106,7 +106,7 @@ Each campaign chooses, per role, the CLI (`codex` or `claude`), the model and th
 
 ## Startup
 
-`launch_role.py` launches the worker, shows it in a pane to the right of the orchestrator (`--no-show` skips that), and watches it until the agent reports a status. It prints JSON with `terminal` and `startup`:
+`launch_role.py` launches the worker, shows it in a pane beside the orchestrator (`--no-show` skips that), and watches it until the agent reports a status. It prints JSON with `terminal` and `startup`:
 
 | `startup` (exit code) | Meaning and action |
 |---|---|
@@ -183,4 +183,4 @@ On `herd-orchestrator resume`, or a continuation prompt, act as the orchestrator
 
 ## Panes
 
-Each worker appears in a pane to the right of the orchestrator while it works; killing and removing it after its step closes the pane. If placement fails (no Herdr window, orchestrator outside Herdr), the campaign continues; the user can show a worker later with `herdr-app do terminal.keep --terminal <t> --place right`.
+Each worker appears in a pane while it works: the first one to the right of the orchestrator, and one launched while another worker of the same folder is still live (Metsuke beside its Samurai) below it, so workers form a right-hand column. Killing and removing it after its step closes the pane. If placement fails (no Herdr window, orchestrator outside Herdr), the campaign continues; the user can show a worker later with `herdr-app do terminal.keep --terminal <t> --place right`.
