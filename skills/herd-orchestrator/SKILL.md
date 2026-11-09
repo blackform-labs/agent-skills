@@ -123,12 +123,32 @@ Wait with `hc wait <t> --timeout 600`, repeated until the worker is not `working
 
 ## Campaign record
 
-`PROJECT/.shogun/campaign.md` is the single source for resuming. Create it at setup and update it at each launch, verdict, decision and stop. It lives in the main checkout, outside the worktree where workers run, and is Git-ignored, so a FAIL reset never touches it; the committed history is `WT/.shogun/progress.md`:
+`PROJECT/.shogun/campaign.md` is the single source for resuming. It lives in the main checkout, outside the worktree where workers run, and is Git-ignored, so a FAIL reset never touches it; the committed history is `WT/.shogun/progress.md`. Create it at setup with exactly three sections:
 
-- objective, project, worktree, branch, approved plan commit, mode (unattended or attended), the user's language (the language of their own messages, not of prompts they paste), the role selection and whether folder trust was authorized;
-- current step, attempt, status and next actor;
-- live terminal names and IDs, evidence paths;
-- verdict per attempt, decisions, user answers, open blockers.
+```markdown
+# Campaign: <short objective>
+
+## Campaign
+- Objective / Project / Worktree / Branch / Approved plan commit
+- Mode / User language / Roles / Folder trust
+
+## Now
+- Step and attempt:
+- Last completed gate:   (verify, scope, review, commit)
+- Next gate and next actor:
+- Live workers:          (name, terminal, status)
+- Evidence:
+- Waiting on the user:   (decisions, questions, blockers; "none")
+
+## Log
+- <time> <event>
+```
+
+- **Campaign** holds facts that rarely change; edit a line in place when one does.
+- **Now** is always rewritten in place, never appended to, so it shows only the current state. Update it at each launch, gate, verdict, decision and stop.
+- **Log** gets one short line per event, newest last: launches, gate results, verdicts with attempt, commits, user answers, role changes, handovers.
+
+The user's language is the language of their own messages, not of prompts they paste.
 
 ## Rules
 
@@ -145,7 +165,7 @@ Wait with `hc wait <t> --timeout 600`, repeated until the worker is not `working
 On `herd-orchestrator resume`, or a continuation prompt, act as the orchestrator:
 
 1. Read this skill, `PROJECT/.shogun/campaign.md`, the plan (`WT/.shogun/plan.json` once the campaign runs, otherwise `PROJECT/.shogun/plan.json`) and `PROJECT/.shogun/roles.json`.
-2. Reconcile the record with the current state before acting: `git -C WT log --oneline`, the evidence folder of the current attempt, and `hc ls --all`. The current state wins; record any difference.
+2. Start from **Now** in the record and reconcile it with the current state before acting: `git -C WT log --oneline`, the evidence folder of the current attempt, and `hc ls --all`. The current state wins; record any difference.
 3. A live worker of the current attempt is waited on, never relaunched. Uncertain delivery: `hc read` first. A finished worker with its evidence already written continues from the next gate (verify, review or decide).
 4. Keep pending human decisions pending. Keep the role selection, trust authorization, mode and language.
 5. Continue the Run loop from the recorded next action.
@@ -155,7 +175,7 @@ On `herd-orchestrator resume`, or a continuation prompt, act as the orchestrator
 `herd-orchestrator hand over` or `handover` transfers the campaign to a fresh orchestrator session. Suggest one yourself between steps when this session's context is getting long.
 
 1. Identify the campaign from this session or its record. If neither establishes one, ask which campaign to transfer.
-2. Update `campaign.md` with the exact stopping point: current step and attempt; each live worker's name, terminal and status (they keep running during the handover); the last completed gate and the next one (verify, review, decide, commit); pending human decisions or blockers; the next action and who takes it. Keep the plan commit, roles, trust authorization, mode and language. Evidence stays in the evidence folder; the record must not depend on this session's memory.
+2. Rewrite **Now** in `campaign.md` with the exact stopping point: step and attempt; each live worker's name, terminal and status (they keep running during the handover); the last completed gate and the next one; what waits on the user; the next action and who takes it. Add a `handover` line to **Log**. Check that **Campaign** still holds the plan commit, roles, trust authorization, mode and language. Evidence stays in the evidence folder; the record must not depend on this session's memory.
 3. Read the record back and check that the files it references exist: worktree (once created), plan, `roles.json`, the current evidence folder. Mark anything missing. If saving fails, say so and put the state inline in the prompt instead.
 4. Return one continuation prompt in English, **on a single line** (multi-line pastes can be cut at the first line break), containing: the skill name and "resume", the objective, the absolute project, worktree, record and `roles.json` paths, the stopping point, the next action, the user's language, and the title `ORQ · <short objective>`. It instructs the new session to follow Resume.
 5. Tell the user to open a new session in the same Herdr space and paste it. Stop here: do not advance the step, kill workers, or wait on them. New worker panes will open beside the new orchestrator.
