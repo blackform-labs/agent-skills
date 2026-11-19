@@ -6,7 +6,7 @@ A collection of reusable skills for agent-assisted work. Each skill lives in its
 
 | Skill | Purpose |
 | --- | --- |
-| [m3-expressive](skills/m3-expressive/SKILL.md) | Design, implement, or review a Material 3 Expressive interface. The web pilot covers layout, spacing, dialogs, and keyboard focus. |
+| [m3-expressive](skills/m3-expressive/SKILL.md) | Design, implement, or review a Material 3 Expressive interface. Check component sizes, spacing, and interaction targets against the [37 component references](skills/m3-expressive/references/components/index.md). |
 | [manual-orchestrator](skills/manual-orchestrator/SKILL.md) | Coordinate a staged objective across fresh chats, with user-carried prompts, evidence-based validation, and a local handover record. |
 | [product-orchestrator](skills/product-orchestrator/SKILL.md) | Coordinate product work through EGM, UI Delivery with Stitch, implementation, and verification, with saved decisions and stage handoffs. |
 

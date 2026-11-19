@@ -1,6 +1,6 @@
 ---
 name: m3-expressive
-description: Design, implement, or review a UI against Material 3 Expressive when the user or project calls for Material Design. Includes web dialog, focus, spacing, and layout guidance.
+description: Design, implement, or review a UI against Material 3 Expressive when the user or project calls for Material Design. Check rendered component dimensions against official variant and state tokens.
 ---
 
 # Material 3 Expressive
@@ -21,11 +21,21 @@ For implementation and review, separate code inspection, rendered observations a
 - For a confirmation, interruption or dialog action, read [Dialogs](references/components/dialogs.md).
 - For a browser implementation of these rules, read [Web layout and modal focus](references/platform/web.md).
 
-For other surfaces, consult the relevant official Material component or style guide, including its guidelines, specs and accessibility sections as applicable. Start with [Material 3](https://m3.material.io/) and [the Expressive update](https://m3.material.io/blog/building-with-m3-expressive). For example, a navigation task needs the rail or bar guidance, and a theme needs color roles. For Compose or Flutter, verify the platform API against its official documentation. If source content cannot be retrieved, mark that point unverified.
+## Verify component dimensions
+
+1. Identify each component by its purpose and anatomy, then choose its [component sheet](references/components/index.md), variant, state and size. In composed controls, classify the outer surface and the interactive child separately. An HTML button inside a disclosure does not automatically use the M3 label-button size scheme.
+2. In Design, specify the applicable dimensions and their source. In Implementation and Review, measure the rendered container, hit area, insets, gaps, icon and text as applicable. Include corner radius or stroke where specified. For responsive or state-dependent values, exercise the relevant width or state. Source-code inspection alone leaves the rendered result unverified.
+3. Compare each measurement with the same quantity in the specification. Preserve the meaning of a default, minimum, maximum, range or content-dependent size. State the project/platform mapping for dp and type units before comparing CSS pixels. Account for density, font scale and wrapping when applicable. For a minimum target on both axes, a measured failure on either axis suffices to flag that dimension. Identify the applicable platform accessibility rule separately from the visual component token.
+4. Record the component and state, property, token or spec link, expected value, measured value and verdict. Use **matches**, **deviation**, **documented project exception**, **unspecified by Material**, or **unverified**. If the sheet omits a value, inspect the official Specs page, including measurement diagrams, before calling it unspecified. If a source is inaccessible, mark it unverified.
+5. Scope any claim of conformance to the properties actually checked. Passing interaction tests says nothing about unmeasured dimensions. Handle an intentional project difference using the conflict procedure below.
+
+For example, for a collapsed feedback card inspect the visible card height, clickable header height, side and vertical padding, and gap to the previous section separately. Apply the card-to-card spacing rule only if the surfaces are a card group. A list row height becomes applicable only when the design uses a list item.
+
+For a newly published component or a missing rule, retrieve the current official [Material component guide](https://m3.material.io/components), its Specs and accessibility pages. For Compose or Flutter, check the platform API as well. Follow the official source if its guidance has changed and identify the difference from the local sheet.
 
 ## Read a rule
 
-Each card has six fields, in order.
+Behavioral guidance uses six fields. Dimensional references use the measurement format above.
 
 1. **Applies** — The condition or component that activates the rule.
 2. **Guidance** — What the source prescribes and its force: requirement, recommendation or option.
