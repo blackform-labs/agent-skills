@@ -15,6 +15,12 @@ Start with the user's task, platform and requested surface. In a new UI, use Mat
 
 For implementation and review, separate code inspection, rendered observations and interactions actually exercised. Name relevant states or viewport widths left untested. An event listener in source alone cannot establish keyboard behavior.
 
+## Recommend a change for every confirmed deviation
+
+Include the correction alongside the finding in the first response. Name the component and state, the owning selector, token or design element, and the applicable criterion and its source. Give the observed → proposed value or behavior, the smallest change that achieves it, and one concrete check that would verify the result. For example, if keyboard dismissal loses focus, identify the close path, the intended focus destination and the keystrokes to test it.
+
+Preserve the force of the criterion. Label a proposed adjustment to an M3 default as a recommendation. For a shared project decision, report the conflict and affected consumers, then give a scoped option the user can choose. Where Material leaves a value open, an explicit product goal can still justify a separately labeled design suggestion. Where evidence is missing, specify the measurement or interaction needed. In Review, deliver suggestions without applying them.
+
 ## Choose references by task
 
 - For priority, grouping, panes or spacing, read [Hierarchy and layout](references/foundations/layout.md).
