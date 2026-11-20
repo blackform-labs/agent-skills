@@ -1,6 +1,6 @@
 ---
 name: m3-expressive
-description: Design, implement, or review a UI against Material 3 Expressive when the user or project calls for Material Design. Check rendered component dimensions against official variant and state tokens.
+description: Design, implement, or review a UI against Material 3 Expressive when the user or project calls for Material Design. Assess visual hierarchy, component use, responsive layouts, interaction, accessibility and dimensional fidelity.
 ---
 
 # Material 3 Expressive
@@ -14,6 +14,12 @@ Start with the user's task, platform and requested surface. In a new UI, use Mat
 - **Review** — Inspect and report without editing project files. For each finding give the location, observed behavior, applicable source and force, user impact and smallest correction. Report successful checks when there are no findings.
 
 For implementation and review, separate code inspection, rendered observations and interactions actually exercised. Name relevant states or viewport widths left untested. An event listener in source alone cannot establish keyboard behavior.
+
+## Review the whole requested surface
+
+For a general UI review, follow the user's task from entry through its outcome. Use the [UI review guide](references/review.md) to choose relevant criteria across the screen, components and transitions. Include discrepancies outside its examples whenever you can identify the intended behavior or design and establish the difference. For a narrowly scoped request, apply the relevant checks within that scope.
+
+Use the same criteria in Design to describe intended states and in Implementation to verify the changed flow. In Review, report findings in order of user impact, followed by the relevant states, environments and checks still unverified. A passing component measurement establishes only that measurement.
 
 ## Recommend a change for every confirmed deviation
 

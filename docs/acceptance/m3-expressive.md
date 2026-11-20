@@ -14,3 +14,7 @@ Use a disposable copy of a real web dialog and its callers. Record the starting 
 Review a collapsed outlined card containing a disclosure button. Supply distinct measurements for the surface, button hit area, side inset, vertical inset, corner radius and gap to the preceding surface. State whether that surface belongs to the same card group. The review should use the card sheet, separate the quantities, identify any deviation with a source and leave the total collapsed height as a product decision when the spec gives no value. Repeat with an explicitly identified one-line list item to verify that the reviewer changes its reference and uses the matching line-count token.
 
 For each confirmed deviation, the first review response should identify the owning element, propose a scoped change with the current and proposed value or behavior, and give a verification step. A request to make an unspecified closed-card height more compact may yield a product recommendation, clearly distinguished from the Material radius correction. A shared style requires an account of its other consumers.
+
+## General UI review
+
+Give the reviewer a task contract and observations of a responsive form. Include a correctly sized control, a clipped action at one width, an error announced as success and a control missing an accessible name. Leave reduced-motion behavior unobserved. A general review should find each supported discrepancy, connect it to the right criterion, propose a scoped correction and verification for each, and identify the missing motion evidence.
