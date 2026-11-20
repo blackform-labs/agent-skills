@@ -6,7 +6,6 @@ A collection of reusable skills for agent-assisted work. Each skill lives in its
 
 | Skill | Purpose |
 | --- | --- |
-| [m3-expressive](skills/m3-expressive/SKILL.md) | Design, implement, or review a Material 3 Expressive interface. Check component sizes, spacing, and interaction targets against the [37 component references](skills/m3-expressive/references/components/index.md). |
 | [manual-orchestrator](skills/manual-orchestrator/SKILL.md) | Coordinate a staged objective across fresh chats, with user-carried prompts, evidence-based validation, and a local handover record. |
 | [product-orchestrator](skills/product-orchestrator/SKILL.md) | Coordinate product work through EGM, UI Delivery with Stitch, implementation, and verification, with saved decisions and stage handoffs. |
 
@@ -27,12 +26,6 @@ npx skills add blackform-labs/agent-skills -g
 The CLI requires Node.js 22.20 or later. To list available skills without installing them, run `npx skills add blackform-labs/agent-skills --list`. Check for updates with `npx skills check` and update CLI-managed installations with `npx skills update`. Restart the agent or start a new session if a newly installed skill is not discovered.
 
 **Codex alternative:** ask Codex to run `$skill-installer` for `https://github.com/blackform-labs/agent-skills/tree/main/skills/manual-orchestrator`. Skills installed this way are separate from CLI-managed installations and do not update automatically.
-
-## Use m3-expressive in Codex
-
-Invoke the skill directly, for example `$m3-expressive review the discard-draft dialog`. To use the companion agent, install the skill, copy [m3-expressive-ui.toml](agents/m3-expressive-ui.toml) to `~/.codex/agents/`, and start a new Codex session. Ask Codex to use the `m3-expressive-ui` agent in Design, Implementation, or Review mode.
-
-For a running web app, the [layout auditor](skills/m3-expressive/tools/ui-auditor/README.md) measures the requested components at mobile, tablet and desktop widths. Its HTML and JSON reports distinguish a missed dimension from a spacing choice that needs visual review.
 
 ## Use manual-orchestrator
 

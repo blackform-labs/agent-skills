@@ -5,3 +5,6 @@ __pycache__/
 .env.*
 
 /private/
+/skills/m3-expressive/
+/agents/m3-expressive-ui.toml
+/docs/acceptance/m3-expressive.md
