@@ -30,8 +30,17 @@ Preserve the force of the criterion. Label a proposed adjustment to an M3 defaul
 ## Choose references by task
 
 - For priority, grouping, panes or spacing, read [Hierarchy and layout](references/foundations/layout.md).
+- For spacing within or between components, responsive grids or density, use [Spacing by relationship](references/foundations/spacing-best-practices.md). Select a role and check its source before assigning a number.
+- For pointer target dimensions on the web, use [WCAG target size and exceptions](references/accessibility/target-sizing.md).
 - For a confirmation, interruption or dialog action, read [Dialogs](references/components/dialogs.md).
 - For a browser implementation of these rules, read [Web layout and modal focus](references/platform/web.md).
+
+## Run a rendered layout review
+
+1. Scope the requested flow and identify the platform, existing tokens, component variants, states and relevant breakpoints. Resolve competing criteria using the [source hierarchy and measurement rules](references/auditing/measurement-rules.md).
+2. When a web surface runs in a controlled browser, use the [Playwright layout auditor](tools/ui-auditor/README.md). Configure the actual selectors, sources, units and expected behavior. Measure each relevant viewport separately. Keep Review read-only and write evidence outside the application.
+3. Compare observed values with their criteria. Inspect contextual warnings with the surrounding elements, content and states. For a visual baseline, use the [visual regression guide](references/auditing/visual-regression.md). Identify coverage gaps if the page, browser or intended state is unavailable.
+4. Give each confirmed discrepancy a scoped correction and a verification step. In an authorized Implementation, repeat the same measurements and exercise the affected interaction after the change.
 
 ## Verify component dimensions
 

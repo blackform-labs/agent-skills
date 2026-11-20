@@ -1,0 +1,148 @@
+{
+  "readySelector": "#brief",
+  "viewports": [
+    {
+      "name": "mobile",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "name": "tablet",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "name": "desktop",
+      "width": 1280,
+      "height": 900
+    }
+  ],
+  "tolerance": 0.5,
+  "cssPxPerDp": 1,
+  "tokens": {
+    "inset": 16
+  },
+  "rules": [
+    {
+      "source": "Brief fixture layout contract (tests/fixtures/layout.html)",
+      "id": "NO-OVERFLOW",
+      "type": "page-overflow",
+      "criterion": "The brief fits the viewport."
+    },
+    {
+      "source": "Brief fixture layout contract (tests/fixtures/layout.html)",
+      "id": "SAVE-HEIGHT",
+      "type": "dimension",
+      "selector": "#save",
+      "property": "height",
+      "comparison": "min",
+      "expected": 48,
+      "unit": "dp",
+      "force": "requirement",
+      "criterion": "Fixture save-button minimum, all sizes."
+    },
+    {
+      "source": "https://m3.material.io/components/cards/specs",
+      "id": "CARD-RADIUS",
+      "type": "dimension",
+      "role": "card",
+      "property": "border-top-left-radius",
+      "expected": 12,
+      "unit": "dp",
+      "criterion": "Outlined card, default corner token, top-left corner only."
+    },
+    {
+      "source": "Brief fixture layout contract (tests/fixtures/layout.html)",
+      "id": "CARD-INSET",
+      "type": "spacing",
+      "role": "card",
+      "property": "padding-left",
+      "tokens": [
+        "inset"
+      ],
+      "criterion": "The two brief cards use the same left inset token."
+    },
+    {
+      "source": "Brief fixture layout contract (tests/fixtures/layout.html)",
+      "id": "ROW-GAPS",
+      "type": "repeated-gaps",
+      "group": "details",
+      "criterion": "Adjacent detail rows have equal space on this view."
+    },
+    {
+      "source": "Brief fixture layout contract (tests/fixtures/layout.html)",
+      "id": "ROW-START",
+      "type": "alignment",
+      "group": "details",
+      "axis": "x",
+      "edge": "start",
+      "criterion": "Detail rows share their physical left edge in this LTR fixture."
+    },
+    {
+      "source": "Brief fixture layout contract (tests/fixtures/layout.html)",
+      "id": "SUMMARY-CLIP",
+      "type": "clipping",
+      "selector": ".summary",
+      "criterion": "Readers must see the full summary."
+    },
+    {
+      "source": "Brief fixture layout contract (tests/fixtures/layout.html)",
+      "id": "TITLE-PROXIMITY",
+      "type": "related-gap",
+      "selector": ".intro",
+      "reference": 16,
+      "criterion": "Compare title-to-summary distance with the fixture's 16px separation between cards."
+    },
+    {
+      "source": "Brief fixture layout contract (tests/fixtures/layout.html)",
+      "id": "ROW-OUTLIER",
+      "type": "group-distance",
+      "group": "details",
+      "factor": 2
+    },
+    {
+      "source": "Brief fixture layout contract (tests/fixtures/layout.html)",
+      "id": "CARD-PADDING",
+      "type": "inconsistent-padding",
+      "role": "card"
+    },
+    {
+      "source": "Brief fixture layout contract (tests/fixtures/layout.html)",
+      "id": "CARD-PEERS",
+      "type": "equivalent-components",
+      "role": "card",
+      "property": "border-top-left-radius"
+    },
+    {
+      "source": "Brief fixture layout contract (tests/fixtures/layout.html)",
+      "id": "REGION-SPACE",
+      "type": "unused-region",
+      "selector": ".region",
+      "fraction": 0.6,
+      "criterion": "Inspect unused space in the compact feedback heading region."
+    }
+  ],
+  "targets": {
+    "selector": "#save",
+    "reviews": [
+      {
+        "selector": "#save",
+        "viewport": "mobile",
+        "rectangularHitAreas": true,
+        "evidence": "Fixture save button has one unobstructed rectangular CSS activation region, with zero radius and no overlapping actions or expanded hit areas."
+      },
+      {
+        "selector": "#save",
+        "viewport": "tablet",
+        "rectangularHitAreas": true,
+        "evidence": "Fixture save button has one unobstructed rectangular CSS activation region, with zero radius and no overlapping actions or expanded hit areas."
+      },
+      {
+        "selector": "#save",
+        "viewport": "desktop",
+        "rectangularHitAreas": true,
+        "evidence": "Fixture save button has one unobstructed rectangular CSS activation region, with zero radius and no overlapping actions or expanded hit areas."
+      }
+    ]
+  }
+}

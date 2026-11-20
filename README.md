@@ -32,6 +32,8 @@ The CLI requires Node.js 22.20 or later. To list available skills without instal
 
 Invoke the skill directly, for example `$m3-expressive review the discard-draft dialog`. To use the companion agent, install the skill, copy [m3-expressive-ui.toml](agents/m3-expressive-ui.toml) to `~/.codex/agents/`, and start a new Codex session. Ask Codex to use the `m3-expressive-ui` agent in Design, Implementation, or Review mode.
 
+For a running web app, the [layout auditor](skills/m3-expressive/tools/ui-auditor/README.md) measures the requested components at mobile, tablet and desktop widths. Its HTML and JSON reports distinguish a missed dimension from a spacing choice that needs visual review.
+
 ## Use manual-orchestrator
 
 In an agent session where the skill is available, start the workflow with:
